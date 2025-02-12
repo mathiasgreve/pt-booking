@@ -1,0 +1,21 @@
+{% extends "./base.html" %}
+{% load static %}
+
+{% block body %}
+    <section class="home">
+        <div class="home-content">
+            <!-- <h3>Hei</h3> -->
+            <h1>Bli en skikkelig <span>O2-snapper</span> i dag!</h1>
+            <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero qui corrupti consectetur, veniam odit nesciunt aliquid fuga in quas culpa dolorem ab ipsum eum voluptas magnam quos natus numquam quo?
+            </p>
+            <div class="btn-box">
+                <button class="btn-1">Book time</button>
+                <button class="btn-2">Min Treningsfilosofi</button>
+            </div>
+        </div>
+        <div class="img-box">
+            <img src="{% static 'frontpage/asmund.jpeg' %}" alt="frontpage-picture">
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Hello</title>
+        <link href="{% static 'frontpage/styles.css' %}" rel="stylesheet">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    </head>
+    <body>
+        <header class="header">
+
+            <a href="{% url 'pt_presentation:hjem' %}" class="logo"><span>Åsm</span>und</a>
+
+            <nav class="navbar">
+                {% for navb in navbarContent %}
+                    {% url navb.url_name as nav_url %}
+
+                    <a href="{% url navb.url_name %}" class="{% if request.resolver_match.url_name == navb.base_name %}active{% endif %}">
+                        {{ navb.display_name }}
+                    </a>                
+                {% endfor %}
+            </nav>
+        
+            <a href="#" class="booking">Book time</a>
+        </header>
+
+        {% block body %}
+        {% endblock %}
+
+    </body>
+</html>
