@@ -10,18 +10,27 @@
     {% block customCSS %}{% endblock %}
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="{% url 'pt_presentation:hjem' %}">Home</a>
-            <a href="#">Appointments</a>
-        </nav>
-    </header>
+    <body>
+        <header class="header">
 
-    <main>
+            <a href="{% url 'pt_presentation:hjem' %}" class="logo"><span>Åsm</span>und</a>
+
+            <nav class="navbar">
+                {% for navb in navbarContent %}
+                    {% url navb.url_name as nav_url %}
+
+                    <a href="{% url navb.url_name %}" class="{% if request.resolver_match.url_name == navb.base_name %}active{% endif %}">
+                        {{ navb.display_name }}
+                    </a>                
+                {% endfor %}
+            </nav>
+        
+        </header>
+
         {% block body %}
-        <p>Welcome to my Django app!</p>
         {% endblock %}
-    </main>
+
+    </body>
 
     <footer>
         <p>© 2025 Your Website Name</p>

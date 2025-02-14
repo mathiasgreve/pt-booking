@@ -3,8 +3,14 @@
 {% block title %}Book Your Appointment{% endblock %}
 
 {% block body %}
-<h2>Choose a Date and Time</h2>
-<form>...</form>
+
+    <h1>PT-tjenester:</h1>
+
+    {% for service in pt_services %}
+        <li>PT-tjeneste: {{service.name}}</li>
+        <p> - {{service.description}}</p>
+    {% endfor %}
+
 {% endblock %}
 
 {% block customJS %}
