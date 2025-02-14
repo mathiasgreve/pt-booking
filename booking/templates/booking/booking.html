@@ -3,14 +3,19 @@
 {% block title %}Book Your Appointment{% endblock %}
 
 {% block body %}
-
+<section class="services-section">
     <h1>PT-tjenester:</h1>
-
-    {% for service in pt_services %}
-        <li>PT-tjeneste: {{service.name}}</li>
-        <p> - {{service.description}}</p>
-    {% endfor %}
-
+    <div class="services-container">
+        {% for service in pt_services %}
+        <div class="service-card">
+            <img src="{{ service.image_url }}" alt="{{ service.name }}" class="service-image">
+            <h2>{{ service.name }}</h2>
+            <p><strong>Type:</strong> {{ service.treatment_type }}</p>
+            <p>{{ service.description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}
 
 {% block customJS %}

@@ -22,6 +22,8 @@ class Service(models.Model):
     service_type = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     duration_minutes = models.PositiveIntegerField()  # Duration of the treatment in minutes
+    image = models.ImageField(upload_to='treatment_images/', blank=True, null=True)  # Add this
+    image_url = models.TextField(blank=True)
 
     def __str__(self):
         return self.name

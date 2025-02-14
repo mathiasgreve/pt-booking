@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pt_presentation',
     'booking',
-    'appointment',
+    # 'appointment',
     #'django_q',
 ]
 
@@ -131,14 +131,14 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #appointment config
-APPOINTMENT_BASE_TEMPLATE = 'booking/booking.html'
-#APPOINTMENT_ADMIN_BASE_TEMPLATE = BASE_DIR / 'base_templates/base.html'  # (optional) Specify a different base template for the admin panel
-APPOINTMENT_WEBSITE_NAME = 'Ptservice'  # Can be set in the Config model.
-APPOINTMENT_PAYMENT_URL = None
-APPOINTMENT_THANK_YOU_URL = None
-APPOINTMENT_BUFFER_TIME = 0  # Can be set in the Config Model. Minutes between now and the first available slot for the current day (doesn't affect future dates)
-APPOINTMENT_SLOT_DURATION = 30  # Can be set in the Config Model. Duration of each appointment slot in minutes 
-APPOINTMENT_LEAD_TIME = (9, 0)  # Can be set in the Config Model. Start time of the appointment slots (in 24-hour format)
-APPOINTMENT_FINISH_TIME = (16, 30)  # Can be set in the Config Model. End time of the appointment slots (in 24-hour format)
-USE_DJANGO_Q_FOR_EMAILS = False  # 🆕 Use Django Q for sending ALL emails.
+# APPOINTMENT_BASE_TEMPLATE = 'booking/booking.html'
+# #APPOINTMENT_ADMIN_BASE_TEMPLATE = BASE_DIR / 'base_templates/base.html'  # (optional) Specify a different base template for the admin panel
+# APPOINTMENT_WEBSITE_NAME = 'Ptservice'  # Can be set in the Config model.
+# APPOINTMENT_PAYMENT_URL = None
+# APPOINTMENT_THANK_YOU_URL = None
+# APPOINTMENT_BUFFER_TIME = 0  # Can be set in the Config Model. Minutes between now and the first available slot for the current day (doesn't affect future dates)
+# APPOINTMENT_SLOT_DURATION = 30  # Can be set in the Config Model. Duration of each appointment slot in minutes 
+# APPOINTMENT_LEAD_TIME = (9, 0)  # Can be set in the Config Model. Start time of the appointment slots (in 24-hour format)
+# APPOINTMENT_FINISH_TIME = (16, 30)  # Can be set in the Config Model. End time of the appointment slots (in 24-hour format)
+# USE_DJANGO_Q_FOR_EMAILS = False  # 🆕 Use Django Q for sending ALL emails.
 

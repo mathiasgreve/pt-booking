@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from appointment.models import Service
+# from appointment.models import Service
+from booking.models import Service
 
 navbarContent = [
     {"url_name": "pt_presentation:hjem", "base_name": "hjem", "display_name": "Hjem"},
