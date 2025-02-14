@@ -12,7 +12,17 @@ navbarContent = [
 # Create your views here.
 def booking(request):
     pt_services = Service.objects.all()
-    return render(request, "booking/booking.html", {
+
+    # if request.user.profile.role == 'trainer':
+    # # Show trainer-specific bookings
+    #     pass
+    # elif request.user.profile.role == 'customer':
+    # # Show customer-specific bookings
+    #     pass
+
+    data = {
         "pt_services": pt_services,
         "navbarContent": navbarContent
-    })
+    }
+
+    return render(request, "booking/booking.html", data)
