@@ -1,14 +1,14 @@
 from django.contrib import admin
-from .models import Profile, Booking, Treatment, Trainer, DaysNotWorking
+from .models import Profile, Booking, Service, Trainer, DaysNotWorking
 
 # Simple registration
 admin.site.register(Profile)
-admin.site.register(Treatment)
+admin.site.register(Service)
 
 # Customize the admin interface for complex models like Booking
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'treatment', 'trainer', 'time', 'date')  # Fields shown in the admin list view
+    list_display = ('user', 'service', 'trainer', 'time', 'date')  # Fields shown in the admin list view
     list_filter = ('trainer', 'date')  # Add filters on the side
     search_fields = ('user__username', 'trainer__name')  # Enable search for related fields
 
