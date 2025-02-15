@@ -8,6 +8,8 @@
     <meta name="description" content="{% block description %}Default description for my website.{% endblock %}">
     <link rel="stylesheet" href="{% static 'booking/style.css' %}">
     {% block customCSS %}{% endblock %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block customJS %}{% endblock %}
 </head>
 <body>
     <body>
@@ -40,7 +42,6 @@
         <p>© 2025 Your Website Name</p>
     </footer>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    {% block customJS %}{% endblock %}
+
 </body>
 </html>

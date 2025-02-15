@@ -50,7 +50,7 @@ span{
 .navbar a.active{
     color: rgb(64, 149, 124);
 }
-.booking {
+.services {
     padding: 10px 28px;
     background-color: white;
     color: black;
@@ -61,7 +61,7 @@ span{
     font-weight: 600;
     transition: 0.3s ease;
 }
-.booking:hover{
+.services:hover{
     background-color: orangered;
     box-shadow: 0 0 25px orangered;
     color: white;

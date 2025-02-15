@@ -11,7 +11,7 @@ navbarContent = [
 ]
 
 # Create your views here.
-def booking(request):
+def services(request):
     pt_services = Service.objects.all()
 
     # if request.user.profile.role == 'trainer':
@@ -26,4 +26,10 @@ def booking(request):
         "navbarContent": navbarContent
     }
 
+    return render(request, "booking/services.html", data)
+
+def booking(request):
+    data = {
+        "navbarContent": navbarContent
+    }
     return render(request, "booking/booking.html", data)

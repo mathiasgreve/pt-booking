@@ -3,25 +3,20 @@
 {% block title %}Book Your Appointment{% endblock %}
 
 {% block body %}
-<section class="services-section">
-    <h1>PT-tjenester:</h1>
-    <div class="services-container">
-        {% for service in pt_services %}
-        <div class="service-card">
-            <img src="{{ service.image_url }}" alt="{{ service.name }}" class="service-image">
-            <h2>{{ service.name }}</h2>
-            <p><strong>Type:</strong> {{ service.treatment_type }}</p>
-            <p>{{ service.description }}</p>
-        </div>
-        {% endfor %}
-    </div>
-</section>
+    <div id='calendar'></div>
 {% endblock %}
 
 {% block customJS %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 <script>
-    $(function() {
-        // Appointment booking script here
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth'
     });
+    calendar.render();
+  });
+
 </script>
 {% endblock %}
