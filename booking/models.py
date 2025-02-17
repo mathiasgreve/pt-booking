@@ -5,14 +5,13 @@ from django.contrib.auth.models import User, AbstractUser
 from django.utils.translation import gettext_lazy as _
 
 
-class User(AbstractUser):
+class MyUser(AbstractUser):
     email = models.EmailField(_('email address'), unique = True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     
     is_admin = models.BooleanField(default=False)
     is_trainer = models.BooleanField(default=False)  # Marks trainers
  
-
 
     def __str__(self):
         return self.username
@@ -34,7 +33,7 @@ class Service(models.Model):
 
 
 class Trainer(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(MyUser, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
     
     @property
@@ -45,7 +44,7 @@ class Trainer(models.Model):
         return self.user.username
     
 class TrainerAvailability(models.Model):
-    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name='availabilities', unique=True)
+    trainer = models.OneToOneField(Trainer, on_delete=models.CASCADE, related_name='availabilities', unique=True)
     
     monday = models.BooleanField(default=False)
     monday_start = models.TimeField(blank=True, null=True)
@@ -79,7 +78,7 @@ class TrainerAvailability(models.Model):
         return f"Availability for {self.trainer.user.username}"
 
 class AvailabilityException(models.Model):
-    trainer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="availability_exceptions")
+    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name="availability_exceptions")
     date = models.DateField()
     is_available = models.BooleanField(default=True)  # False = not available
     start_time = models.TimeField(blank=True, null=True)  # Optional custom time
@@ -91,8 +90,8 @@ class AvailabilityException(models.Model):
 
 
 class Booking(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    trainer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="trainer_bookings", limit_choices_to={'is_trainer': True})
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name="trainer_bookings")
 
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
     
