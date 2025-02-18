@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User, AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class MyUser(AbstractUser):
     email = models.EmailField(_('email address'), unique = True)
@@ -22,7 +22,7 @@ class Service(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     
-    duration_minutes = models.PositiveIntegerField()  # Duration of the treatment in minutes
+    duration_minutes = models.PositiveIntegerField(help_text="Duration in minutes")  # Duration of the treatment in minutes
     
     price = models.DecimalField(max_digits=10, decimal_places=2)
     
@@ -30,7 +30,7 @@ class Service(models.Model):
     image_url = models.TextField(blank=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.duration_minutes} min)"
 
 
 class Trainer(models.Model):
@@ -93,11 +93,12 @@ class AvailabilityException(models.Model):
 class Booking(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name="trainer_bookings")
-
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
     
     date = models.DateField()
     time = models.TimeField()
+    end_time = models.TimeField(blank=True, null=True)  # End time (calculated)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     status = models.CharField(
@@ -107,33 +108,49 @@ class Booking(models.Model):
     )
     
     def clean(self):
-        """Validate if the booking time falls within the trainer's availability."""
+        """Validate if the booking time falls within the trainer's availability and prevent duplicate bookings."""
+        # Ensure trainer has availability set
         try:
-            availability = self.trainer.availabilities  # Get the trainer's availability
+            availability = self.trainer.availabilities
         except TrainerAvailability.DoesNotExist:
             raise ValidationError("This trainer does not have availability set up.")
 
-        # Determine the weekday of the booking
-        weekday = self.date.strftime('%A').lower()  # Example: "monday"
+        # Get the day of the week
+        weekday = self.date.strftime('%A').lower()
 
-        # Check if the trainer is available on that day
-        available = getattr(availability, weekday, False)  # Check if trainer is available that day
+        # Check if trainer is available on that day
+        available = getattr(availability, weekday, False)
         start_time = getattr(availability, f"{weekday}_start", None)
         end_time = getattr(availability, f"{weekday}_end", None)
 
-        # If the trainer is not available on that day, raise an error
         if not available or not start_time or not end_time:
             raise ValidationError(f"{self.trainer.user.username} is not available on {weekday.capitalize()}.")
+        
+        # Calculate `end_time` using service duration
+        if self.service and self.service.duration_minutes:
+            self.end_time = (datetime.combine(self.date, self.time) + timedelta(minutes=self.service.duration_minutes)).time()
+        else:
+            raise ValidationError("Service duration must be set.")
 
-        # Check if the booking time is within the available hours
+        # Check if booking time is within trainer's working hours. NB this will go past the trainer's end_time for the day 
         if not (start_time <= self.time <= end_time):
             raise ValidationError(f"Booking time must be between {start_time} and {end_time} on {weekday.capitalize()}.")
 
+        #  Prevent double/overlapping bookings at the same time 
+        overlapping_booking = Booking.objects.filter(
+            trainer=self.trainer, 
+            date=self.date
+        ).exclude(id=self.id).filter(  # Exclude current booking when updating
+            models.Q(time__lt=self.end_time, end_time__gt=self.time)
+        )
+
+        if overlapping_booking.exists():
+            raise ValidationError("This trainer already has a booking that overlaps with this time.")
+
     def save(self, *args, **kwargs):
         """Ensure validation runs before saving."""
-        self.clean()  # Run the validation
+        self.clean()  # Run validation
         super().save(*args, **kwargs)  # Proceed with saving
-
 
     def __str__(self):
         return f"Booking for {self.user.username} on {self.date} at {self.time}"
