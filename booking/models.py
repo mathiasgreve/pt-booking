@@ -95,8 +95,8 @@ class Booking(models.Model):
     trainer = models.ForeignKey(Trainer, on_delete=models.CASCADE, related_name="trainer_bookings")
     service = models.ForeignKey('Service', on_delete=models.CASCADE)
     
-    date = models.DateField()
-    time = models.TimeField()
+    date = models.DateField(null=True, blank=True)  # Allow empty date initially
+    time = models.TimeField(null=True, blank=True)  # Allow empty time initially
     end_time = models.TimeField(blank=True, null=True)  # End time (calculated)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -108,39 +108,39 @@ class Booking(models.Model):
     )
     
     def clean(self):
-        """Validate if the booking time falls within the trainer's availability and prevent duplicate bookings."""
-        # Ensure trainer has availability set
+        """Validate only when date and time are set."""
+        if not self.date or not self.time:
+            return  # Skip validation if date or time is missing
+
         try:
             availability = self.trainer.availabilities
         except TrainerAvailability.DoesNotExist:
             raise ValidationError("This trainer does not have availability set up.")
 
-        # Get the day of the week
+        # Get weekday and trainer's availability
         weekday = self.date.strftime('%A').lower()
-
-        # Check if trainer is available on that day
         available = getattr(availability, weekday, False)
         start_time = getattr(availability, f"{weekday}_start", None)
         end_time = getattr(availability, f"{weekday}_end", None)
 
         if not available or not start_time or not end_time:
             raise ValidationError(f"{self.trainer.user.username} is not available on {weekday.capitalize()}.")
-        
-        # Calculate `end_time` using service duration
+
+        # Calculate `end_time` using service duration if available
         if self.service and self.service.duration_minutes:
             self.end_time = (datetime.combine(self.date, self.time) + timedelta(minutes=self.service.duration_minutes)).time()
-        else:
+        elif self.date and self.time:
             raise ValidationError("Service duration must be set.")
 
-        # Check if booking time is within trainer's working hours. NB this will go past the trainer's end_time for the day 
+        # Validate booking time within trainer's availability
         if not (start_time <= self.time <= end_time):
             raise ValidationError(f"Booking time must be between {start_time} and {end_time} on {weekday.capitalize()}.")
 
-        #  Prevent double/overlapping bookings at the same time 
+        # Prevent overlapping bookings
         overlapping_booking = Booking.objects.filter(
             trainer=self.trainer, 
             date=self.date
-        ).exclude(id=self.id).filter(  # Exclude current booking when updating
+        ).exclude(id=self.id).filter(
             models.Q(time__lt=self.end_time, end_time__gt=self.time)
         )
 
@@ -148,9 +148,10 @@ class Booking(models.Model):
             raise ValidationError("This trainer already has a booking that overlaps with this time.")
 
     def save(self, *args, **kwargs):
-        """Ensure validation runs before saving."""
-        self.clean()  # Run validation
+        """Ensure validation runs before saving, but only if date and time exist."""
+        if self.date and self.time:  
+            self.clean()  # Only validate when both fields are set
         super().save(*args, **kwargs)  # Proceed with saving
 
     def __str__(self):
-        return f"Booking for {self.user.username} on {self.date} at {self.time}"
+        return f"Booking for {self.user.username} on {self.date} at {self.time}" if self.date and self.time else f"Booking for {self.user.username} (Pending Date/Time)"

@@ -3,20 +3,76 @@
 {% block title %}Book Your Appointment{% endblock %}
 
 {% block body %}
-    <div id='calendar'></div>
+
+<div class="booking-container">
+
+    <h1 id="h1-head">Select a Date</h1>
+
+    <!-- Calender widget -->
+    <div id='calendar' service-id="{{ service_id }}"></div>
+
+    <!-- Available Time Slots -->
+    <h3>Ledige tidspunkter:</h3>
+    <div id="available-slots" class="slots-container"></div>
+
+    <!-- Confirm booking -->
+    <button id="confirm-booking" style="display: none;">Confirm Booking</button>
+</div>
+{{ trainer|json_script:"trainer-name"}}
 {% endblock %}
+
+
 
 {% block customJS %}
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script></script>
 <script>
 
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
+    var serviceId = calendarEl.getAttribute('service-id');  // Get booking ID
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth'
+        initialView: 'dayGridMonth',
+        selectable: true,
+        // events: '/api/available-dates/',
+        dateClick: function(info) {
+            // fetchAvailableTimes(info.dateStr, serviceId);
+            const selectedDate = new Date(info.dateStr);
+
+            // sjekk om valgt dato er forbi
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            if(selectedDate < today) {
+              console.log("Date is in the past");
+            } else {
+              
+              // call fetchAvailableTimes() here ...
+              fetchAvailableTimes(info.dateStr, serviceId);
+
+            }
+        },
+        selectAllow: function (info) {
+        return (info.start >= getDateWithoutTime(new Date()));
+    },
     });
     calendar.render();
-  });
+});
+
+function getDateWithoutTime(dt) {
+    dt.setHours(0, 0, 0, 0);
+    return dt;
+}
+
+function fetchAvailableTimes(date, serviceId) {
+  const trainerName = JSON.parse(document.getElementById("trainer-name").textContent);
+  console.log(trainerName);
+
+  // fetch() fra databasen med en api-spørring /api/get-available-timeslots...
+
+}
 
 </script>
 {% endblock %}
+
+
