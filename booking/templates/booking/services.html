@@ -10,9 +10,8 @@
         <div class="service-card">
             <img src="{{ service.image_url }}" alt="{{ service.name }}" class="service-image">
             <h2>{{ service.name }}</h2>
-            <p><strong>Type:</strong> {{ service.treatment_type }}</p>
             <p>{{ service.description }}</p>
-            <a href="{% url 'booking:booking' %}" class="booking">Book time</a>
+            <a href="{% url 'booking:booking' service.id %}" class="booking">Book time</a>
         </div>
         {% endfor %}
     </div>
