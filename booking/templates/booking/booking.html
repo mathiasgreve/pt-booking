@@ -35,12 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         selectable: true,
-        // events: '/api/available-dates/',
         dateClick: function(info) {
+
             // fetchAvailableTimes(info.dateStr, serviceId);
             const selectedDate = new Date(info.dateStr);
 
-            // sjekk om valgt dato er forbi
+            // sjekk om valgt dato er passert
             const today = new Date();
             today.setHours(0,0,0,0);
             if(selectedDate < today) {
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
               
               // call fetchAvailableTimes() here ...
-              fetchAvailableTimes(info.dateStr, serviceId);
+              fetchAvailableTimeSlots(info.dateStr);
 
             }
         },
@@ -64,13 +64,28 @@ function getDateWithoutTime(dt) {
     return dt;
 }
 
-function fetchAvailableTimes(date, serviceId) {
-  const trainerName = JSON.parse(document.getElementById("trainer-name").textContent);
-  console.log(trainerName);
+  // Fetch available time slots when user selects a date
+  function fetchAvailableTimeSlots(date) {
+    fetch(`/booking/api/get_available_slots/?date=${date}`)
+      .then(response => response.json())
+      .then(data => {
+        let slotsContainer = document.getElementById("available-slots");
+        slotsContainer.innerHTML = ""; // Clear previous slots
+        
+        if (data.times.length > 0) {
+          data.times.forEach(slot => {
+            let btn = document.createElement("button");
+            btn.classList.add("time-slot");
+            btn.innerText = slot;
+            btn.onclick = () => bookTimeSlot(date, slot);
+            slotsContainer.appendChild(btn);
+          });
+        } else {
+          slotsContainer.innerHTML = "<p>Ingen ledige tidspunkter.</p>";
+        }
+      });
+  }
 
-  // fetch() fra databasen med en api-spørring /api/get-available-timeslots...
-
-}
 
 </script>
 {% endblock %}

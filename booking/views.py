@@ -50,7 +50,7 @@ def available_times(request):
     weekday = date.strftime('%A').lower()
 
     if not getattr(trainer, weekday):
-        return JsonResponse({"times": []})  # Trainer not available
+        return JsonResponse({"times": []})  # Trainer not available on that weekday
 
     start_time = getattr(trainer, f"{weekday}_start")
     end_time = getattr(trainer, f"{weekday}_end")
