@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import TrainerAvailability, Booking, Service, Trainer
-from booking.models import Service, Booking
+from booking.models import Service, Booking, MyUser
 from datetime import datetime, timedelta
-from django.http import JsonResponse
-from django.views import View
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -44,7 +42,14 @@ def available_dates(request):
 
 def available_times(request):
     date_str = request.GET.get('date')
-    date = datetime.strptime(date_str, "%Y-%m-%d").date()
+
+    if not date_str:
+        return JsonResponse({"success": False, "error": "Date is required!"})
+
+    try:
+        date = datetime.strptime(date_str, "%Y-%m-%d").date()  # Convert string to date object
+    except ValueError:
+        return JsonResponse({"success": False, "error": "Invalid date format!"})
     
     trainer = TrainerAvailability.objects.first()  # Example: Get first trainer
     weekday = date.strftime('%A').lower()
@@ -61,7 +66,61 @@ def available_times(request):
         times.append(current_time.strftime("%H:%M"))
         current_time = (datetime.combine(date, current_time) + timedelta(minutes=30)).time()
 
-    booked_times = Booking.objects.filter(date=date).values_list('time', flat=True)
-    available_times = [t for t in times if t not in booked_times]
+    # Fetch existing bookings for this date
+    booked_slots = Booking.objects.filter(date=date).values("time", "end_time")
+
+    # Exclude times that fall within booked slots
+    available_times = []
+    for slot in times:
+        slot_time = datetime.strptime(slot, "%H:%M").time()
+        
+        # Check if this slot is within any booked session
+        if any(booking["time"] <= slot_time < booking["end_time"] for booking in booked_slots):
+            continue  # Skip unavailable times
+        
+        available_times.append(slot)
+
 
     return JsonResponse({"times": available_times})
+
+
+def create_booking(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            date_str = data.get("date")  
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+            time = data.get("time")
+            additional_info = data.get("additional_info", "")
+            service_id = data.get("service_id")  # Get service_id from request
+
+            if not service_id:
+                return JsonResponse({"success": False, "error": "Service ID missing!"})
+
+            # Convert time string to a valid TimeField format
+            time_obj = datetime.strptime(time, "%H:%M").time()
+
+            # Fetch the service
+            service = Service.objects.get(id=service_id)  # Fix here
+
+            # Assign a trainer (modify as needed)
+            trainer = Trainer.objects.first()
+            user = request.user  # Ensure the user is authenticated
+
+            # Create booking
+            booking = Booking.objects.create(
+                user=user,
+                trainer=trainer,
+                service=service,
+                date=date,
+                time=time_obj
+            )
+
+            return JsonResponse({"success": True, "booking_id": booking.id})
+
+        except Service.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Service not found!"})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Invalid request method"})
