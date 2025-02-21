@@ -6,18 +6,18 @@
 {% block body %}
 
 <div class="booking-container">
+  <h1 id="h1-head">Select a Date</h1>
 
-    <h1 id="h1-head">Select a Date</h1>
+  <!-- CSRF Token (Required for Django POST requests) -->
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
-    <!-- Calender widget -->
-    <div id='calendar' service-id="{{ service_id }}"></div>
+  <!-- Calendar widget -->
+  <div id='calendar' service-id="{{ service_id }}"></div>
 
-    <!-- Available Time Slots -->
-    <h3>Ledige tidspunkter:</h3>
-    <div id="available-slots" class="slots-container"></div>
+  <!-- Available Time Slots -->
+  <h3>Ledige tidspunkter:</h3>
+  <div id="available-slots" class="slots-container"></div>
 
-    <!-- Confirm booking -->
-    <button id="confirm-booking" style="display: none;">Confirm Booking</button>
 </div>
 {% endblock %}
 

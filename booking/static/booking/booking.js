@@ -53,6 +53,57 @@ function fetchAvailableTimeSlots(date) {
 
 function showBookTimeSlot(date, slot) {
     let slotsContainer = document.getElementById("available-slots");
+    
+    // Clear previous content to avoid duplicates
+    slotsContainer.innerHTML = `<h3>Selected Time: ${slot}</h3>`;
+
+    // Create a textarea for additional info
     let textField = document.createElement("textarea");
+    textField.id = "additional-info";
+    textField.placeholder = "Optional: Add any additional information...";
     slotsContainer.appendChild(textField);
+
+    // Create the confirm booking button
+    let confirmButton = document.createElement("button");
+    confirmButton.id = "confirm-booking";
+    confirmButton.innerText = "Confirm Booking";
+    confirmButton.style.display = "block";
+    confirmButton.onclick = () => submitBooking(date, slot, textField.value);
+    
+    slotsContainer.appendChild(confirmButton);
+}
+
+// Function to send the booking request
+function submitBooking(date, time, additionalInfo) {
+    let serviceId = document.getElementById("calendar").getAttribute("service-id"); // Get service ID
+
+    fetch("/booking/api/create_booking/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify({
+            date: date,
+            time: time,
+            additional_info: additionalInfo,
+            service_id: serviceId // Include service ID
+
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Booking confirmed!");
+            location.reload();
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+// Function to get CSRF token for Django POST requests
+function getCSRFToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]").value;
 }
