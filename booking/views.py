@@ -66,12 +66,20 @@ def available_times(request):
         times.append(current_time.strftime("%H:%M"))
         current_time = (datetime.combine(date, current_time) + timedelta(minutes=30)).time()
 
-    # Fetch booked times and convert them to string format
-    booked_times = Booking.objects.filter(date=date).values_list('time', flat=True)
-    booked_times = [bt.strftime("%H:%M") for bt in booked_times]  # Convert to string format
+    # Fetch existing bookings for this date
+    booked_slots = Booking.objects.filter(date=date).values("time", "end_time")
 
-    # Remove booked times from available slots
-    available_times = [t for t in times if t not in booked_times]
+    # Exclude times that fall within booked slots
+    available_times = []
+    for slot in times:
+        slot_time = datetime.strptime(slot, "%H:%M").time()
+        
+        # Check if this slot is within any booked session
+        if any(booking["time"] <= slot_time < booking["end_time"] for booking in booked_slots):
+            continue  # Skip unavailable times
+        
+        available_times.append(slot)
+
 
     return JsonResponse({"times": available_times})
 
