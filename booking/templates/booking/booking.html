@@ -1,4 +1,5 @@
 {% extends "./base.html" %}
+{% load static %}
 
 {% block title %}Book Your Appointment{% endblock %}
 
@@ -18,76 +19,16 @@
     <!-- Confirm booking -->
     <button id="confirm-booking" style="display: none;">Confirm Booking</button>
 </div>
-{{ trainer|json_script:"trainer-name"}}
 {% endblock %}
 
 
 
 {% block customJS %}
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
-<script></script>
-<script>
 
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var serviceId = calendarEl.getAttribute('service-id');  // Get booking ID
+  {{ trainer|json_script:"trainer-name"}}
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        selectable: true,
-        dateClick: function(info) {
-
-            // fetchAvailableTimes(info.dateStr, serviceId);
-            const selectedDate = new Date(info.dateStr);
-
-            // sjekk om valgt dato er passert
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            if(selectedDate < today) {
-              console.log("Date is in the past");
-            } else {
-              
-              // call fetchAvailableTimes() here ...
-              fetchAvailableTimeSlots(info.dateStr);
-
-            }
-        },
-        selectAllow: function (info) {
-        return (info.start >= getDateWithoutTime(new Date()));
-    },
-    });
-    calendar.render();
-});
-
-function getDateWithoutTime(dt) {
-    dt.setHours(0, 0, 0, 0);
-    return dt;
-}
-
-  // Fetch available time slots when user selects a date
-  function fetchAvailableTimeSlots(date) {
-    fetch(`/booking/api/get_available_slots/?date=${date}`)
-      .then(response => response.json())
-      .then(data => {
-        let slotsContainer = document.getElementById("available-slots");
-        slotsContainer.innerHTML = ""; // Clear previous slots
-        
-        if (data.times.length > 0) {
-          data.times.forEach(slot => {
-            let btn = document.createElement("button");
-            btn.classList.add("time-slot");
-            btn.innerText = slot;
-            btn.onclick = () => bookTimeSlot(date, slot);
-            slotsContainer.appendChild(btn);
-          });
-        } else {
-          slotsContainer.innerHTML = "<p>Ingen ledige tidspunkter.</p>";
-        }
-      });
-  }
-
-
-</script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+  <script src="{% static 'booking/booking.js' %}"></script>
 {% endblock %}
 
 
