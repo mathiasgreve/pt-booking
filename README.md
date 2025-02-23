@@ -4,7 +4,7 @@ This is a **Personal Trainer Booking Website** that allows users to book trainin
 
 ---
 
-## 🚀 Features
+## Features
 
 - **Service Selection**: Users can browse and select different PT services.
 - **Calendar Integration**: Users can select an available date from the calendar.
@@ -15,13 +15,13 @@ This is a **Personal Trainer Booking Website** that allows users to book trainin
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Backend**: Django (Python)
 - **Frontend**: HTML, CSS, JavaScript
-- **Database**: PostgreSQL / SQLite (depending on setup)
+- **Database**: SQLite
 - **JavaScript Libraries**: FullCalendar.js (for calendar UI)
-- **Styling**: Tailwind CSS / Custom CSS
+- **Styling**: Custom CSS
 
 ---
 
