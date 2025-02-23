@@ -12,3 +12,22 @@ This is a **Personal Trainer Booking Website** that allows users to book trainin
 - **User Input Field**: Users can add optional notes when booking.
 - **Responsive Design**: Optimized for both desktop and mobile users.
 - **Modern UI**: Interactive service cards and smooth animations.
+
+---
+
+## 🛠️ Technologies Used
+
+- **Backend**: Django (Python)
+- **Frontend**: HTML, CSS, JavaScript
+- **Database**: PostgreSQL / SQLite (depending on setup)
+- **JavaScript Libraries**: FullCalendar.js (for calendar UI)
+- **Styling**: Tailwind CSS / Custom CSS
+
+---
+
+## Future Improvements
+
+- User Authentication (Login/Signup)
+- Email Notifications for Bookings
+- Admin Dashboard for Trainers
+- Payment Integration
